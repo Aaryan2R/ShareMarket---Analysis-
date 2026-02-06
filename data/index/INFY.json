@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "company_name": "Infosys Ltd",
+    "symbol": "INFY",
+    "exchange": [
+      "NSE",
+      "BSE"
+    ],
+    "created_on": "2026-01-28",
+    "status": "active"
+  },
+  "knowledge": {
+    "sections": {},
+    "semantic_sections": {},
+    "last_updated": null
+  },
+  "signals": {
+    "news_sentiment": {},
+    "price_trend": {},
+    "intraday_bias": {
+      "bias": "NEUTRAL",
+      "score": 0,
+      "reasons": [],
+      "last_updated": "2026-01-28"
+    }
+  }
+}

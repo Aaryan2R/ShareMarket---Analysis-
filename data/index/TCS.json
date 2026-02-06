@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "company_name": "Tata Consultancy Services Ltd",
+    "symbol": "TCS",
+    "exchange": [
+      "NSE",
+      "BSE"
+    ],
+    "created_on": "2026-01-28",
+    "status": "active"
+  },
+  "knowledge": {
+    "sections": {},
+    "semantic_sections": {},
+    "last_updated": null
+  },
+  "signals": {
+    "news_sentiment": {
+      "overall": "neutral",
+      "confidence": 0.863,
+      "positive": 1,
+      "negative": 2,
+      "neutral": 2,
+      "source": "data\\cleaned\\TCS\\news\\sentiment.json",
+      "last_updated": "2026-01-28"
+    },
+    "price_trend": {},
+    "intraday_bias": {
+      "bias": "NEUTRAL",
+      "score": 0,
+      "reasons": [],
+      "last_updated": "2026-01-28"
+    }
+  }
+}

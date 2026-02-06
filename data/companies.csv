@@ -1,0 +1,4 @@
+company_name,last_quarterly,last_annual,last_price_daily,last_price_weekly,last_news,status,reports_complete
+Tata Consultancy Services,,,2026-01-28,,2026-01-28,failed,False
+Infosys,,,2026-01-28,,2026-01-28,failed,False
+Reliance Industries Ltd,,,,,,failed,False

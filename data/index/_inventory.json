@@ -1,0 +1,19 @@
+{
+  "generated_on": "2026-01-28",
+  "companies": [
+    {
+      "symbol": "INFY",
+      "company_name": "Infosys Ltd",
+      "last_updated": null,
+      "has_news_sentiment": false,
+      "has_price_trend": false
+    },
+    {
+      "symbol": "TCS",
+      "company_name": "Tata Consultancy Services Ltd",
+      "last_updated": null,
+      "has_news_sentiment": true,
+      "has_price_trend": false
+    }
+  ]
+}
