@@ -1,0 +1,20 @@
+[
+  {
+    "company": "Infosys",
+    "action": "AVOID",
+    "reason": "No aligned conviction",
+    "confidence": 50
+  },
+  {
+    "company": "Reliance Industries Ltd",
+    "action": "AVOID",
+    "reason": "No aligned conviction",
+    "confidence": 50
+  },
+  {
+    "company": "Tata Consultancy Services",
+    "action": "AVOID",
+    "reason": "No aligned conviction",
+    "confidence": 65
+  }
+]

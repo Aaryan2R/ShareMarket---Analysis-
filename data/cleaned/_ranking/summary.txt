@@ -1,0 +1,39 @@
+========== RANK 1 ==========
+date (Score: NA)
+Bias: 2026-01-31
+Trend strength: NA
+Momentum: NA
+Volatility risk: NA
+
+Interpretation:
+Limited structured data available. Use discretionary judgment.
+
+========== RANK 2 ==========
+ranking (Score: NA)
+Bias: NA
+Trend strength: NA
+Momentum: NA
+Volatility risk: NA
+
+Interpretation:
+Limited structured data available. Use discretionary judgment.
+
+========== RANK 3 ==========
+top_picks (Score: NA)
+Bias: NA
+Trend strength: NA
+Momentum: NA
+Volatility risk: NA
+
+Interpretation:
+Limited structured data available. Use discretionary judgment.
+
+========== RANK 4 ==========
+avoid (Score: NA)
+Bias: NA
+Trend strength: NA
+Momentum: NA
+Volatility risk: NA
+
+Interpretation:
+Limited structured data available. Use discretionary judgment.

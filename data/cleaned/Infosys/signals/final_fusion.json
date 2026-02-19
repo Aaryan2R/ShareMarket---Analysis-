@@ -1,6 +1,6 @@
 {
-  "final_confidence_score": 75,
+  "final_confidence_score": 50,
   "news_bias": "NEUTRAL",
   "fundamental_strength": "WEAK",
-  "final_trade_bias": "HIGH_CONVICTION"
+  "final_trade_bias": "LOW_CONFIDENCE"
 }

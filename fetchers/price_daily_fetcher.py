@@ -2,6 +2,7 @@ from processors.symbol_resolver import ensure_symbol
 import yfinance as yf
 from pathlib import Path
 
+
 def fetch_daily_prices(company_name: str) -> bool:
     yahoo_symbol = ensure_symbol(company_name)
     if not yahoo_symbol:
@@ -11,7 +12,7 @@ def fetch_daily_prices(company_name: str) -> bool:
     try:
         df = yf.download(
             yahoo_symbol,
-            period="6mo",
+            period="5y",   # 🔥 upgraded from 6mo → 5 years
             auto_adjust=True,
             progress=False
         )
@@ -27,7 +28,9 @@ def fetch_daily_prices(company_name: str) -> bool:
     outdir.mkdir(parents=True, exist_ok=True)
 
     outfile = outdir / "daily.csv"
+
+    # Avoid duplicate appends → overwrite fully
     df.reset_index().to_csv(outfile, index=False)
 
-    print(f"[{company_name}] daily prices saved to {outfile}")
+    print(f"[{company_name}] daily prices saved (5Y) to {outfile}")
     return True

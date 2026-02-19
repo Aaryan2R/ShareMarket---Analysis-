@@ -1,0 +1,23 @@
+[
+  {
+    "company": "Infosys",
+    "total_trades": 55,
+    "wins": 6,
+    "losses": 49,
+    "win_rate_pct": 10.91
+  },
+  {
+    "company": "Reliance Industries Ltd",
+    "total_trades": 57,
+    "wins": 8,
+    "losses": 49,
+    "win_rate_pct": 14.04
+  },
+  {
+    "company": "Tata Consultancy Services",
+    "total_trades": 57,
+    "wins": 5,
+    "losses": 52,
+    "win_rate_pct": 8.77
+  }
+]

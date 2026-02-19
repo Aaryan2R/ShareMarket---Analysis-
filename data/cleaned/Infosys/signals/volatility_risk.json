@@ -1,6 +1,6 @@
 {
-  "weekly_volatility_pct": 3.03,
-  "monthly_volatility_pct": 3.27,
-  "risk_regime": "MEDIUM",
-  "trading_suitability": "INTRADAY + SWING"
+  "weekly_volatility_pct": 3.4,
+  "monthly_volatility_pct": 7.1,
+  "risk_regime": "HIGH",
+  "trading_suitability": "INTRADAY ONLY"
 }
