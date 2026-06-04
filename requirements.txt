@@ -1,10 +1,24 @@
-pandas
-numpy
-requests
-beautifulsoup4
-lxml
-yfinance
-torch
-transformers
-plotly
-pytest
+# Core data
+pandas==2.2.3
+numpy==2.0.2
+
+# HTTP and parsing
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.3.0
+
+# Finance data
+yfinance==0.2.51
+
+# ML / NLP — FinBERT sentiment
+torch==2.5.1
+transformers==4.47.1
+
+# Charts
+plotly==5.24.1
+
+# Testing
+pytest==8.3.5
+
+# UI extras (already in stdlib on most systems, listed for clarity)
+# tkinter — bundled with Python, no pip install needed
