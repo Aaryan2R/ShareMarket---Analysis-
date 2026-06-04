@@ -1,6 +1,10 @@
 pandas
+numpy
 requests
 beautifulsoup4
 lxml
 yfinance
-numpy
+torch
+transformers
+plotly
+pytest

@@ -1,97 +1,88 @@
-"""
-Main entry point for Intraday Helper system
+import argparse
+from pathlib import Path
+from core.orchestrator import Orchestrator, IntelligenceDB
+from core.market_data import normalize_existing_price_csvs
 
-Execution order (LOCKED):
-1. Inventory (truth check)
-2. IR report fetch (best source)
-3. Exchange report fetch (fallback)
-4. Daily price fetch (independent)
-5. Price aggregation (weekly + monthly)
-6. Normalize reports (organize + rename)
-7. Inventory re-check (truth update)
-"""
+ROOT = Path(".")
 
-import pandas as pd
-import sys
 
-from processors.report_inventory import run_inventory
-from processors.normalize_reports import run_normalize
-from processors.price_aggregate import aggregate_prices
+def auto_register_companies(db: IntelligenceDB):
+    """
+    Auto-detect companies from data/raw folder
+    and insert into DB if not present.
+    """
+    raw_path = ROOT / "data" / "raw"
 
-from fetchers.ir_report_fetcher import fetch_ir_reports
-from fetchers.report_fetcher import fetch_reports
-from fetchers.price_daily_fetcher import fetch_daily_prices
+    if not raw_path.exists():
+        print("[SYSTEM] data/raw folder not found.")
+        return
 
-sys.stdout.reconfigure(encoding="utf-8")
+    for company_dir in raw_path.iterdir():
+        if company_dir.is_dir():
+            name = company_dir.name.strip()
+            if not db.get_company_id(name):
+                db.add_company(name)
+                print(f"[SYSTEM] Registered company: {name}")
+
+
+def print_ranking(ranking):
+    print("\n==============================")
+    print("   MARKET INTELLIGENCE RANK   ")
+    print("==============================\n")
+
+    for i, r in enumerate(ranking, 1):
+        print(f"{i}. {r['company']}  |  Score: {r['composite_score']}")
+
+    print("\n==============================\n")
 
 
 def main():
-    print("\n=== Starting Intraday Helper ===\n")
 
-    # 1️⃣ Inventory first (truth layer)
-    print("[SYSTEM] Running inventory check")
-    run_inventory()
+    parser = argparse.ArgumentParser(description="Market Intelligence Engine")
+    parser.add_argument(
+        "--force-strategy",
+        action="store_true",
+        help="Force rebuild of strategy backtests (ignore 6h cache)"
+    )
+    parser.add_argument(
+        "--normalize-csvs",
+        action="store_true",
+        help="Normalize active daily CSV files before refreshing"
+    )
+    parser.add_argument(
+        "--rank-only",
+        action="store_true",
+        help="Print cached rankings without rebuilding packets"
+    )
+    args = parser.parse_args()
 
-    # 2️⃣ Load companies.csv safely
-    try:
-        df = pd.read_csv("data/companies.csv", dtype=str)
-    except FileNotFoundError:
-        print("[ERROR] data/companies.csv not found")
+    print("\n=== MARKET INTELLIGENCE ENGINE STARTING ===\n")
+
+    orchestrator = Orchestrator()
+
+    # Step 1: Auto-register companies from raw data
+    auto_register_companies(orchestrator.db)
+
+    if args.normalize_csvs:
+        print("[SYSTEM] Normalizing active daily CSV files...")
+        for company, rows in normalize_existing_price_csvs():
+            print(f"[SYSTEM] {company}: {rows} rows")
+
+    if args.rank_only:
+        print("[SYSTEM] Using cached rankings.")
+        print_ranking(orchestrator.rank_all_companies())
         return
 
-    if df.empty or "company_name" not in df.columns:
-        print("[SYSTEM] No valid companies found in CSV")
-        return
+    # Step 2: Refresh all intelligence
+    print("[SYSTEM] Refreshing intelligence...")
+    packets = orchestrator.refresh_all(force_strategy=args.force_strategy)
+    print(f"[SYSTEM] Built {len(packets)} packets.")
 
-    # 3️⃣ Per-company pipeline
-    for _, row in df.iterrows():
-        company = str(row["company_name"]).strip()
+    # Step 3: Ranking
+    ranking = orchestrator.rank_all_companies()
+    print_ranking(ranking)
 
-        if not company:
-            continue
-
-        print(f"\n[SYSTEM] Processing {company}")
-
-        # --- IR reports (priority source) ---
-        try:
-            print(f"[{company}] IR fetch attempt")
-            fetch_ir_reports(company)
-        except Exception as e:
-            print(f"[{company}] IR fetch failed:", e)
-
-        # --- NSE/BSE fallback ---
-        try:
-            print(f"[{company}] Exchange fetch attempt")
-            fetch_reports(company)
-        except Exception as e:
-            print(f"[{company}] Exchange fetch failed:", e)
-
-        # --- Daily prices ---
-        try:
-            print(f"[{company}] Daily price fetch")
-            fetch_daily_prices(company)
-        except Exception as e:
-            print(f"[{company}] Daily price fetch failed:", e)
-
-        # --- Weekly + Monthly aggregation ---
-        try:
-            print(f"[{company}] Aggregating prices")
-            aggregate_prices(company)
-        except Exception as e:
-            print(f"[{company}] Price aggregation failed:", e)
-
-    # 4️⃣ Normalize reports
-    print("\n[SYSTEM] Normalizing reports")
-    try:
-        run_normalize()
-    except Exception as e:
-        print("[SYSTEM] Normalization failed:", e)
-
-    # 5️⃣ Final inventory refresh
-    print("\n[SYSTEM] Re-checking inventory")
-    run_inventory()
-
-    print("\n=== System run completed ===\n")
+    print("=== SYSTEM RUN COMPLETE ===\n")
 
 
 if __name__ == "__main__":
