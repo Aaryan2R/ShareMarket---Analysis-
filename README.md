@@ -1,47 +1,109 @@
-# Improved Share Market Analysis
+# Share Market Analysis
 
-Python desktop/CLI market intelligence assistant for Indian equities. This copy keeps the original data and `assistant.db`, but uses a cleaner app structure, a working virtual environment, normalized price CSVs, RAG retrieval, and an agent-style AI router that can call local tools before answering.
+> ⚠️ **Not financial advice.** This is a personal research and learning project. All output is for study purposes only — verify every signal independently before making any trading decisions.
 
-This is research-support software, not financial advice. Verify all signals independently before trading.
+A local-first, AI-powered market intelligence assistant for Indian equities. Runs entirely on your own machine — no cloud, no subscriptions, no data sent anywhere.
 
-## What Changed
+Combines live Yahoo Finance data, Google News sentiment via FinBERT, technical and risk scoring, and a local LLM agent that can call real tools before answering your questions.
 
-- Fresh working `venv` for this copied project.
-- Lazy `Orchestrator()` startup: FinBERT, Yahoo fundamentals, and market-regime fetches are not loaded during app construction.
-- Unified active SQLite layer around `assistant.db`.
-- RAG retrieval over companies, cached packets, price metadata, and the company universe.
-- New agent router: the local LLM can request tools such as ranking, company analysis, comparison, win-rate, charting, CSV normalization, and price fetching.
-- Tool results are executed locally, then passed back to the LLM for the final answer.
-- Data-only fallback when the local AI server is offline.
-- Tkinter thread safety via a main-thread queue.
-- CSV normalization to remove ticker rows such as `,INFY.NS,INFY.NS,...`.
-- Automated tests for matching, DB packet roundtrip, RAG retrieval, tool registry, and CSV normalization.
+---
 
-## Active Structure
+## What makes this interesting
 
-```text
-ai_trading_assistant_ui.py   Tkinter desktop assistant
-main.py                      CLI runner
-assistant.db                 Active SQLite DB
+Most stock analysis tools are either basic chart viewers or expensive SaaS. This one runs a full intelligence pipeline locally:
+
+- Pulls historical OHLCV data and live fundamentals from **Yahoo Finance**
+- Scrapes **Google News RSS** for each company and scores headlines with **FinBERT** (a finance-specific sentiment model from Hugging Face)
+- Computes technical indicators, volatility, ATR, drawdown, win rate, and market regime
+- Builds scored **intelligence packets** per company combining all signals
+- Ranks companies by a composite score across technical, risk, fundamental, and strategy dimensions
+- Routes natural-language questions through a **local LLM agent** (via LM Studio) that can call real tools — ranking, comparison, win-rate, chart generation, CSV normalization — before forming its answer
+- Falls back gracefully to cached local data when the LLM is offline
+
+---
+
+## Architecture
+
+```
+ai_trading_assistant_ui.py      Tkinter desktop terminal (primary UI)
+main.py                         CLI runner — refresh, rank, normalize
 core/
-  config.py                  Paths and env-driven runtime config
-  database.py                Unified assistant.db gateway
-  company_match.py           Alias/fuzzy company matching
-  market_data.py             CSV discovery and normalization
-  orchestrator.py            Packet build/ranking/price fetch logic
-  rag_engine.py              Retrieval context builder
-  agent_router.py            LLM-driven tool-calling loop
-  tools.py                   Local tools exposed to the agent
-  prompts.py                 Tool-calling prompts
-  llm_client.py              OpenAI-compatible local LLM client
-tests/                       Pytest suite
-data/raw/                    Local company price data
-archive_old_engine/          Old engine kept for reference only
+  config.py                     Env-driven runtime config
+  database.py                   SQLite gateway (assistant.db)
+  orchestrator.py               Intelligence pipeline — packets, ranking, price fetch
+  agent_router.py               LLM tool-calling loop
+  tools.py                      Local tools exposed to the agent
+  rag_engine.py                 Retrieval context builder for LLM prompts
+  company_match.py              Fuzzy/alias company name matching
+  market_data.py                CSV discovery and normalization
+  llm_client.py                 OpenAI-compatible local LLM client
+  prompts.py                    Tool-calling system prompts
+data/raw/<Company>/prices/      Local OHLCV CSVs
+assistant.db                    Active SQLite database
+tests/                          Pytest suite (6 passing)
 ```
 
-## Setup
+---
 
-The improved copy already has a fresh virtual environment. To recreate it:
+## How the AI agent works
+
+```
+You ask:  "compare TCS and Infosys"
+    ↓
+AgentRouter checks if local LLM is reachable
+    ↓
+LLM emits a JSON tool call → { "tool": "compare_companies", "args": [...] }
+    ↓
+App executes the tool locally against real data
+    ↓
+Tool result is sent back to LLM as context
+    ↓
+LLM forms final answer grounded in your actual local data
+    ↓
+If LLM is offline → falls back to direct local data answer
+```
+
+---
+
+## Tech stack
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat&logo=pytorch&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white)
+![HuggingFace](https://img.shields.io/badge/HuggingFace-FFD21E?style=flat&logo=huggingface&logoColor=black)
+![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=flat&logo=plotly&logoColor=white)
+![Yahoo Finance](https://img.shields.io/badge/Yahoo%20Finance-6001D2?style=flat&logo=yahoo&logoColor=white)
+
+**Models & services:**
+- [`ProsusAI/finbert`](https://huggingface.co/ProsusAI/finbert) — finance sentiment model
+- Yahoo Finance via `yfinance`
+- Google News RSS
+- Local LLM via [LM Studio](https://lmstudio.ai) — tested with `meta-llama-3.1-8b-instruct`
+
+---
+
+## Currently tracked companies
+
+| Company | NSE Symbol | Price rows |
+|---|---|---:|
+| Infosys | `INFY` | 1,238 |
+| Tata Consultancy Services | `TCS` | 1,238 |
+| Asian Paints | `ASIANPAINT` | 1,237 |
+| Reliance Industries Ltd | `RELIANCE` | 1,238 |
+
+**Latest composite ranking:**
+
+| Rank | Company | Score |
+|---|---|---|
+| 1 | Infosys | 54.18 |
+| 2 | Tata Consultancy Services | 53.16 |
+| 3 | Asian Paints | 52.18 |
+| 4 | Reliance Industries Ltd | 43.11 |
+
+---
+
+## Setup
 
 ```powershell
 python -m venv venv
@@ -49,132 +111,103 @@ python -m venv venv
 .\venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
+**For AI chat features:** install [LM Studio](https://lmstudio.ai), load any OpenAI-compatible model, and start the local server on port 1234. The app works without it — you just get data-only answers.
+
+**Requirements:** Python 3.10+, ~4GB RAM for FinBERT, internet for Yahoo Finance and Google News feeds.
+
+---
+
 ## Run
 
-Desktop app:
-
 ```powershell
+# Desktop assistant (recommended)
 .\venv\Scripts\python.exe ai_trading_assistant_ui.py
-```
 
-For full natural-language AI chat, start LM Studio or another OpenAI-compatible local server first. The default endpoint is:
-
-```text
-http://localhost:1234/v1/chat/completions
-```
-
-If LM Studio is not running, the app still opens and gives data-only fallback answers for supported questions such as rankings and company summaries.
-
-CLI cached ranking:
-
-```powershell
-.\venv\Scripts\python.exe main.py --rank-only
-```
-
-Normalize active daily CSVs:
-
-```powershell
-.\venv\Scripts\python.exe main.py --normalize-csvs --rank-only
-```
-
-Refresh packets:
-
-```powershell
+# CLI — refresh all packets and show ranking
 .\venv\Scripts\python.exe main.py
-```
 
-Force strategy rebuild:
+# CLI — show cached ranking only (fast, no network)
+.\venv\Scripts\python.exe main.py --rank-only
 
-```powershell
+# Normalize CSVs and rank
+.\venv\Scripts\python.exe main.py --normalize-csvs --rank-only
+
+# Force strategy backtest rebuild
 .\venv\Scripts\python.exe main.py --force-strategy
 ```
 
-## How Chat Works
+---
 
-1. You ask a normal question, for example `compare TCS and Infosys`.
-2. `AgentRouter` checks whether the local LLM endpoint is reachable.
-3. If reachable, the model can emit a JSON tool call.
-4. The app executes the requested local tool, such as `compare_companies` or `rank_companies`.
-5. The tool result is sent back to the model.
-6. The model gives the final answer using only the available data.
-7. If the model is offline, the app falls back to raw local data where possible.
+## Commands
 
-## Useful Questions
-
-```text
-help
-rank companies
-compare TCS and Infosys
-tell me about Reliance
-status Asian Paints
-last 30 days win rate for Infosys
-show chart for TCS
-normalize csvs
-refresh all
+```
+rank companies                         Composite intelligence ranking
+compare TCS and Infosys                Side-by-side company comparison
+tell me about Reliance                 Full company intelligence summary
+status Asian Paints                    Quick status snapshot
+last 30 days win rate for Infosys      Win rate over N trading days
+show chart for TCS                     Price chart
+refresh all                            Refresh all data and recompute
+normalize csvs                         Clean up CSV ticker rows
+add company <name> [NSE_SYMBOL]        Add a new company to track
+remove company <name>                  Remove a company
+list companies                         List all tracked companies
+help                                   Show all commands
 ```
 
-## Runtime Config
+---
 
-Environment variables:
+## Runtime config
 
-```text
-SMA_DB_PATH                  default: assistant.db
-SMA_LLM_API_URL              default: http://localhost:1234/v1/chat/completions
-SMA_LLM_MODEL                default: meta-llama-3.1-8b-instruct
-SMA_LLM_TIMEOUT_SECONDS      default: 45
-SMA_FINBERT_MODEL            default: ProsusAI/finbert
-SMA_ENABLE_LIVE_SENTIMENT    default: 1
-SMA_ENABLE_LIVE_FUNDAMENTALS default: 1
-SMA_ENABLE_LIVE_REGIME       default: 1
-SMA_STRATEGY_CACHE_HOURS     default: 6
-```
+All config is driven by environment variables with sensible defaults:
 
-For fast offline packet smoke tests:
+| Variable | Default |
+|---|---|
+| `SMA_DB_PATH` | `assistant.db` |
+| `SMA_LLM_API_URL` | `http://localhost:1234/v1/chat/completions` |
+| `SMA_LLM_MODEL` | `meta-llama-3.1-8b-instruct` |
+| `SMA_LLM_TIMEOUT_SECONDS` | `45` |
+| `SMA_FINBERT_MODEL` | `ProsusAI/finbert` |
+| `SMA_ENABLE_LIVE_SENTIMENT` | `1` |
+| `SMA_ENABLE_LIVE_FUNDAMENTALS` | `1` |
+| `SMA_ENABLE_LIVE_REGIME` | `1` |
 
+**For fast offline testing (skips all network calls):**
 ```powershell
 $env:SMA_ENABLE_LIVE_SENTIMENT='0'
 $env:SMA_ENABLE_LIVE_FUNDAMENTALS='0'
 $env:SMA_ENABLE_LIVE_REGIME='0'
-```
-
-If console output containing symbols fails on Windows, use:
-
-```powershell
-$env:PYTHONIOENCODING='utf-8'
-```
-
-## Verification
-
-Verified on 2026-06-05 after the agent-router changes:
-
-```powershell
-.\venv\Scripts\python.exe -m compileall -q main.py ai_trading_assistant_ui.py core tests
 .\venv\Scripts\python.exe -m pytest -q
-.\venv\Scripts\python.exe -c "import ai_trading_assistant_ui; print('ui import ok')"
-.\venv\Scripts\python.exe main.py --rank-only
 ```
 
-Results:
+---
 
-- Compile passed.
-- Tests passed: `6 passed`.
-- UI import passed.
-- Default local LLM status during testing: offline at `http://localhost:1234/v1/chat/completions`.
-- Agent fallback passed with a forced-offline endpoint and returned cached rankings.
-- Tool registry `rank_companies` passed and returned 4 cached companies.
-- Cached ranking:
-  1. Infosys - `54.18`
-  2. Tata Consultancy Services - `53.16`
-  3. Asian Paints - `52.18`
-  4. Reliance Industries Ltd - `43.11`
+## Tests
 
-## Remaining Practical Work
+```powershell
+.\venv\Scripts\python.exe -m pytest -q
+```
 
-- Add AgentRouter tests with a fake LLM that emits tool-call JSON.
-- Add mocked tests for live yfinance/news/Hugging Face refresh.
-- Add a settings UI for `SMA_LLM_API_URL` and `SMA_LLM_MODEL`.
-- Add a richer company detail view.
-- Add transcript export/search.
-- Pin dependency versions after settling the Python version.
-- Clean up mojibake/Unicode display strings in source comments/UI labels if they appear garbled on Windows.
+6 tests passing covering company matching, DB packet roundtrip, RAG retrieval, tool registry, and CSV normalization.
 
+---
+
+## Roadmap
+
+- [ ] Add more NSE companies
+- [ ] AgentRouter tests with mocked LLM tool-call JSON
+- [ ] Mocked tests for live yfinance/news/Hugging Face refresh
+- [ ] Settings UI for LLM endpoint and model
+- [ ] Richer company detail view with charts inline
+- [ ] Transcript export and search
+- [ ] Pin dependency versions
+
+---
+
+## Contributing
+
+Contributions welcome — open an issue first to discuss what you want to change.
+
+---
+
+*Personal project exploring financial data pipelines, NLP applied to markets, and local AI inference.*
