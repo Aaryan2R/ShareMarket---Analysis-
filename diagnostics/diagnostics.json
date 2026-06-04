@@ -1,0 +1,95 @@
+{
+  "timestamp": "2026-02-21T19:32:01.692064",
+  "results": [
+    {
+      "company": "Infosys",
+      "found_csv": "data\\raw\\Infosys\\prices\\daily\\daily.csv",
+      "searched_samples": [
+        "data\\raw\\Infosys\\prices\\daily\\daily.csv"
+      ],
+      "df_present": true,
+      "validation": {
+        "company": "Infosys",
+        "raw_last_date": "2026-02-19",
+        "rag_last": null,
+        "ok": true
+      },
+      "win_rate_30": {
+        "company": "Infosys",
+        "days": 30,
+        "wins": 8,
+        "total": 30,
+        "win_rate": 26.67
+      }
+    },
+    {
+      "company": "Reliance Industries Ltd",
+      "found_csv": "data\\raw\\Reliance Industries Ltd\\prices\\daily\\daily.csv",
+      "searched_samples": [
+        "data\\raw\\Reliance Industries Ltd\\prices\\daily\\daily.csv"
+      ],
+      "df_present": true,
+      "validation": {
+        "company": "Reliance Industries Ltd",
+        "raw_last_date": "2026-02-19",
+        "rag_last": null,
+        "ok": true
+      },
+      "win_rate_30": {
+        "company": "Reliance Industries Ltd",
+        "days": 30,
+        "wins": 14,
+        "total": 30,
+        "win_rate": 46.67
+      }
+    },
+    {
+      "company": "Tata Consultancy Services",
+      "found_csv": "data\\raw\\Tata Consultancy Services\\prices\\daily\\daily.csv",
+      "searched_samples": [
+        "data\\raw\\Tata Consultancy Services\\prices\\daily\\daily.csv"
+      ],
+      "df_present": true,
+      "validation": {
+        "company": "Tata Consultancy Services",
+        "raw_last_date": "2026-02-19",
+        "rag_last": null,
+        "ok": true
+      },
+      "win_rate_30": {
+        "company": "Tata Consultancy Services",
+        "days": 30,
+        "wins": 11,
+        "total": 30,
+        "win_rate": 36.67
+      }
+    }
+  ],
+  "csv_listing": {
+    "Infosys": [
+      "data\\raw\\Infosys\\prices\\monthly.csv",
+      "data\\raw\\Infosys\\prices\\weekly.csv",
+      "data\\raw\\Infosys\\prices\\daily\\daily.csv",
+      "data\\raw\\Infosys\\prices\\monthly\\monthly.csv",
+      "data\\raw\\Infosys\\prices\\weekly\\weekly.csv"
+    ],
+    "Reliance Industries Ltd": [
+      "data\\raw\\Reliance Industries Ltd\\prices\\monthly.csv",
+      "data\\raw\\Reliance Industries Ltd\\prices\\weekly.csv",
+      "data\\raw\\Reliance Industries Ltd\\prices\\daily\\daily.csv",
+      "data\\raw\\Reliance Industries Ltd\\prices\\monthly\\monthly.csv",
+      "data\\raw\\Reliance Industries Ltd\\prices\\weekly\\weekly.csv"
+    ],
+    "Tata Consultancy Services": [
+      "data\\raw\\Tata Consultancy Services\\prices\\monthly.csv",
+      "data\\raw\\Tata Consultancy Services\\prices\\weekly.csv",
+      "data\\raw\\Tata Consultancy Services\\prices\\daily\\daily.csv",
+      "data\\raw\\Tata Consultancy Services\\prices\\monthly\\monthly.csv",
+      "data\\raw\\Tata Consultancy Services\\prices\\weekly\\weekly.csv"
+    ]
+  },
+  "news_fetch": {
+    "company": "Infosys",
+    "count": 43
+  }
+}
